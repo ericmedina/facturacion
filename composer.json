@@ -2,7 +2,7 @@
     "name": "pampadev/facturacion",
     "description": "modulo de facturacion",
     "type": "project",
-    "license": "GPL",
+    "license": "MIT",
     "authors": [
         {
             "name": "pampadev",
