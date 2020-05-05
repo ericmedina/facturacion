@@ -14,10 +14,10 @@ class FacturacionServiceProvider extends ServiceProvider
     public function boot()
     {
         //
-        include __DIR__.'/routes.php';
+        include __DIR__.'/routes/api.php';
         $this->publishes([
             __DIR__.'/config/facturacion.php'   => config_path('facturacion.php'),
-            __DIR__.'/facturacion/certs'        => public_path('facturacion/certs'),
+            __DIR__.'/facturacion/certs'        => storage_path('facturacion/certs'),
         ]);
     }
 
