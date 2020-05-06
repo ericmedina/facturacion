@@ -19,7 +19,7 @@
     },
     "autoload": {
         "classmap": [
-            "app/database/migrations"
+            "src/database/migrations"
         ],
         "psr-4": {
             "Pampadev\\Facturacion\\": "src/"
