@@ -1,5 +1,10 @@
-<?php 
+<?php
 
-Route::get('/facturacion/create', 'Pampadev\Facturacion\Controllers\FacturacionController@create');
+use Pampadev\Models\Comprobante;
+
+Route::get('/facturacion/prueba', function(){
+    $comprobante = new Comprobante;
+    dd($comprobante);
+});
 
  ?>

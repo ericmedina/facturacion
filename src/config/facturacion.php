@@ -40,7 +40,6 @@ return [
     #########################################################################
 
     'URL_WSAA_HOMO'     =>  "https://wsaahomo.afip.gov.ar/ws/services/LoginCms?wsdl",
-
     'WSDL_WSAA_HOMO'    =>"https://wsaahomo.afip.gov.ar/ws/services/LoginCms?wsdl",
 
     #COMP_ULTIMO

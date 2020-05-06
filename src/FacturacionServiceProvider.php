@@ -14,11 +14,18 @@ class FacturacionServiceProvider extends ServiceProvider
     public function boot()
     {
         //
-        include __DIR__.'/routes.php';
+        $this->loadRoutesFrom(__DIR__.'/routes.php');
         $this->publishes([
-            __DIR__.'/config/facturacion.php'   => config_path('facturacion.php'),
-            __DIR__.'/facturacion/certs'        => storage_path('facturacion/certs'),
-        ]);
+            __DIR__.'/config/facturacion.php'   =>  config_path('facturacion.php')
+        ], 'config');
+
+        $this->publishes([
+            __DIR__.'/database/migrations'      =>  database_path('migrations')
+        ], 'migrations');
+        
+        $this->publishes([
+            __DIR__.'/facturacion'              =>  public_path('facturacion')
+        ],'assets');
     }
 
     /**
@@ -28,7 +35,6 @@ class FacturacionServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->make('Pampadev\Facturacion\Controllers\FacturacionController');
         $this->app->make('Pampadev\Facturacion\Facturacion');
     }
 }
