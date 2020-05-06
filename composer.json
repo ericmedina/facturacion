@@ -22,7 +22,8 @@
             "src/database/migrations"
         ],
         "psr-4": {
-            "Pampadev\\Facturacion\\": "src/"
+            "Pampadev\\Facturacion\\": "src/",
+            "Pampadev\\Models\\": "src/models/"
         }
     },
     "extra": {
