@@ -18,6 +18,9 @@
         "phpunit/phpunit" : "~5.0"
     },
     "autoload": {
+        "classmap": [
+            "app/database/migrations"
+        ],
         "psr-4": {
             "Pampadev\\Facturacion\\": "src/"
         }
