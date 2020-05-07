@@ -1,5 +1,5 @@
 <?php
-
+namespace Pampadev\Facturacion\Models;
 
 class AlicuotaComprobante{
 

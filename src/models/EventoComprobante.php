@@ -1,5 +1,6 @@
 <?php
 
+namespace Pampadev\Facturacion\Models;
 class EventoComprobante{
     protected $table = 'eventos_comprobante';
 

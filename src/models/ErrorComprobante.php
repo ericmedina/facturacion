@@ -1,5 +1,6 @@
 <?php
 
+namespace Pampadev\Facturacion\Models;
 
 class ErrorComprobante{
     protected $table = 'errores_comprobante';

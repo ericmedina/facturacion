@@ -1,6 +1,6 @@
 <?php
 
-namespace Pampadev\Facturacion;
+namespace Pampadev\Facturacion\Models;
 
 class ObservacionComprobante{
     protected $table = 'observaciones_comprobante';
