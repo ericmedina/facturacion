@@ -1,6 +1,6 @@
 {
     "name": "pampadev/facturacion",
-    "description": "Módulo de facturación",
+    "description": "modulo de facturacion",
     "type": "project",
     "license": "MIT",
     "authors": [
@@ -18,17 +18,20 @@
         "phpunit/phpunit" : "~5.0"
     },
     "autoload": {
+        "classmap": [
+            "src/database/migrations"
+        ],
         "psr-4": {
-            "Pampadev\\": "src/"
+            "Pampadev\\Facturacion\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Pampadev\\FacturacionServiceProvider"
+                "Pampadev\\Facturacion\\FacturacionServiceProvider"
             ],
             "aliases": {
-                "Facturacion": "Pampadev\\"
+                "Facturacion": "Pampadev\\Facturacion\\"
             }
         }
     }

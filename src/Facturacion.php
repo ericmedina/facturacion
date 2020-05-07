@@ -2,7 +2,7 @@
 /**
 * 
 */
-namespace Pampadev;
+namespace Pampadev\Facturacion;
 
 
 use Illuminate\Filesystem\Filesystem;
