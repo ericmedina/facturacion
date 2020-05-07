@@ -1,8 +1,9 @@
 <?php
-
 namespace Pampadev\Facturacion\Models;
 
-class ErrorComprobante{
+use Illuminate\Database\Eloquent\Model;
+
+class ErrorComprobante extends model{
     protected $table = 'errores_comprobante';
     
     public function comprobante(){

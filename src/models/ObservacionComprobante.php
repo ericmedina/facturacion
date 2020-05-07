@@ -2,7 +2,9 @@
 
 namespace Pampadev\Facturacion\Models;
 
-class ObservacionComprobante{
+use Illuminate\Database\Eloquent\Model;
+
+class ObservacionComprobante extends Model{
     protected $table = 'observaciones_comprobante';
     
     public function comprobante(){

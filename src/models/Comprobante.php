@@ -1,7 +1,9 @@
 <?php 
 namespace Pampadev\Facturacion\Models;
 
-class Comprobante{
+use Illuminate\Database\Eloquent\Model;
+
+class Comprobante extends model{
 
     
     public function alicuotas(){

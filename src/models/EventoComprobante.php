@@ -1,7 +1,9 @@
 <?php
-
 namespace Pampadev\Facturacion\Models;
-class EventoComprobante{
+
+use Illuminate\Database\Eloquent\Model;
+
+class EventoComprobante extends model{
     protected $table = 'eventos_comprobante';
 
     public function comprobante(){

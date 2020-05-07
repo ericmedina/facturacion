@@ -1,7 +1,9 @@
 <?php
 namespace Pampadev\Facturacion\Models;
 
-class AlicuotaComprobante{
+use Illuminate\Database\Eloquent\Model;
+
+class AlicuotaComprobante extends model{
 
     protected $table = 'alicuotas_comprobante';
     
