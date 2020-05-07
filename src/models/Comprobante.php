@@ -1,7 +1,5 @@
 <?php 
 
-namespace Pampadev\Facturacion;
-
 class Comprobante{
 
     

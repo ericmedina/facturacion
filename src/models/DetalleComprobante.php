@@ -1,6 +1,5 @@
 <?php
 
-namespace Pampadev\Facturacion;
 
 class DetalleComprobante{
     protected $table = 'detalles_comprobante';
