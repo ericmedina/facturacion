@@ -1,23 +1,23 @@
 <?php 
 
-namespace Pampadev\Models;
+namespace Pampadev\Facturacion;
 
 class Comprobante{
 
     
     public function alicuotas(){
-        return $this->hasMany('PampaDev\Models\AlicuotaComprobante');
+        return $this->hasMany('Pampadev\Facturacion\AlicuotaComprobante');
     }
 
     public function eventos(){
-        return $this->hasMany('PampaDev\Models\EventoComprobante');
+        return $this->hasMany('Pampadev\Facturacion\EventoComprobante');
     }
 
     public function observaciones(){
-        return $this->hasMany('PampaDev\Models\ObservacionComprobante');
+        return $this->hasMany('Pampadev\Facturacion\ObservacionComprobante');
     }
 
     public function errores(){
-        return $this->hasMany('PampaDev\Models\ErrorComprobante');
+        return $this->hasMany('Pampadev\Facturacion\ErrorComprobante');
     }
 }

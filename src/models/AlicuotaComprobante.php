@@ -1,13 +1,13 @@
 <?php
 
-namespace Pampadev\Models;
+namespace Pampadev\Facturacion;
 
 class AlicuotaComprobante{
 
     protected $table = 'alicuotas_comprobante';
     
     public function comprobante(){
-        return $this->belongsTo('PampaDev\Models\Comprobante');
+        return $this->belongsTo('Pampadev\Facturacion\Comprobante');
     }
 
 }

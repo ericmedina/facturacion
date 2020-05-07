@@ -1,11 +1,11 @@
 <?php
 
-namespace Pampadev\Models;
+namespace Pampadev\Facturacion;
 
 class DetalleComprobante{
     protected $table = 'detalles_comprobante';
 
     public function comprobante(){
-        return $this->belongsTo('PampaDev\Models\Comprobante');
+        return $this->belongsTo('Pampadev\Facturacion\Comprobante');
     }
 }
