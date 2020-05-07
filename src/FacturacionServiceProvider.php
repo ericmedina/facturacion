@@ -1,6 +1,6 @@
 <?php
 
-namespace Pampadev\Facturacion;
+namespace Pampadev;
 
 use Illuminate\Support\ServiceProvider;
 

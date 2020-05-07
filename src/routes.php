@@ -1,6 +1,6 @@
 <?php
 
-use Pampadev\Facturacion\Comprobante;
+use Pampadev\Comprobante;
 
 Route::get('/facturacion/prueba', function(){
     $comprobante = new Comprobante;
