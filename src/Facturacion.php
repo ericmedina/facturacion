@@ -415,8 +415,6 @@ class Facturacion
 
 		#LLAMAMOS CLIENTE SOAP
 
-
-
 		$client = new \SoapClient($this->WSDL_CAE, array(
 			'soap_version'   => SOAP_1_2,
 			'location'       => $this->URL_TIPO_IVA,
@@ -605,6 +603,10 @@ class Facturacion
 		return $response;
 	}
 
+	#-------------------------------------------------------------------------------------
+	#MANEJO DE EVENTOS, ERRORES Y OBSERVACIONES
+	#SETEA LOS ATRIBUTOS CORRESPONDIENTES EN LA CLASE
+	#=====================================================================================
 	public function obtener_observaciones_cae($response){
 		$observaciones = [];
 		if(isset($response->FECAESolicitarResult->FeDetResp->FECAEDetResponse->Observaciones)){
@@ -624,7 +626,6 @@ class Facturacion
 			}
 		}
 	}
-
 	public function obtener_errores_cae($response){
 		$errores = [];
 		if(isset($response->FECAESolicitarResult->Errors)){
@@ -665,6 +666,7 @@ class Facturacion
 			}
 		}
 	}
+
 
 	public function guardar_comprobante(){
 		if($this->comprobante->save()){
