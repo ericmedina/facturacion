@@ -2,6 +2,7 @@
 
 use Pampadev\Facturacion\Facturacion;
 use Pampadev\Facturacion\Models\AlicuotaComprobante;
+use Pampadev\Facturacion\Models\DetalleComprobante;
 use Pampadev\Facturacion\Models\Comprobante;
 
 Route::get('/facturacion/prueba', function(){
@@ -29,8 +30,30 @@ Route::get('/facturacion/prueba', function(){
     
             $alicuotas[] = $alicuota;
 
-            $facturacion = new Facturacion($comprobante, ...$alicuotas);
-            $facturacion->solicitar_cae();
+            $detalles = [];
+            $detalle = new DetalleComprobante;
+            $detalle->codigo = "0";
+            $detalle->descripcion = "Detalle de prueba";
+            $detalle->importe = $imptotal;
+            $detalle->cantidad = 1;
+            
+            $detalles[] = $detalle;
+
+            $detalle = new DetalleComprobante;
+            $detalle->codigo = "1";
+            $detalle->descripcion = "Otro detalle de prueba";
+            $detalle->importe = $imptotal;
+            $detalle->cantidad = 1;
+            
+            $detalles[] = $detalle;
+
+            $facturacion = new Facturacion;
+
+            $facturacion->addComprobante($comprobante);
+            $facturacion->addAlicuotas(...$alicuotas);
+            $facturacion->addDetalles(...$detalles);
+
+            $facturacion->generar_comprobante();
         }
         $tiempo_fin = microtime(true);
         $tiempo = $tiempo_fin - $tiempo_inicio;

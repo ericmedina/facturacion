@@ -8,6 +8,7 @@ namespace Pampadev\Facturacion;
 
 
 use Pampadev\Facturacion\Models\AlicuotaComprobante;
+use Pampadev\Facturacion\Models\DetalleComprobante;
 use Pampadev\Facturacion\Models\Comprobante;
 use Pampadev\Facturacion\Models\ErrorComprobante;
 use Pampadev\Facturacion\Models\EventoComprobante;
@@ -95,11 +96,8 @@ class Facturacion
 	public $FECAESolicitar;
 
 
-	function __construct(Comprobante $comprobante, AlicuotaComprobante ...$alicuotas)
+	function __construct()
 	{
-		$this->comprobante = $comprobante;
-		$this->alicuotas = $alicuotas;
-
 		$this->observaciones = [];
 		$this->errores = [];
 		$this->eventos = [];
@@ -113,7 +111,16 @@ class Facturacion
 		$this->key = $this->facturacion_path('certs/' . config('facturacion.key'));
 		$this->setear_urls();
 
-		$this->validar_atributos();
+	}
+
+	public function addComprobante(Comprobante $comprobante){
+		$this->comprobante = $comprobante;
+	}
+	public function addAlicuotas(AlicuotaComprobante ...$alicuotas){
+		$this->alicuotas = $alicuotas;
+	}
+	public function addDetalles(DetalleComprobante ...$detalles){
+		$this->detalles = $detalles;
 	}
 	#------------------------------------------------------------------------------
 	#FUNCION UTILIZABLE DE WSAA CREA XML TA.XML
@@ -204,9 +211,10 @@ class Facturacion
 		$this->sign = $sign;
 	}
 
-	public function solicitar_cae(){
+	public function generar_comprobante(){
+		$this->validar_atributos();
 		$this->comprobante->numero = $this->UltimoAutorizado()+1;
-		$this->CAE_Factura_A();
+		$this->obtener_cae();
 	}
 	#-------------------------------------------------------------------------------
 	#FUNCION ULTIMO COMPROBANTE AUTORIZADO
@@ -236,46 +244,11 @@ class Facturacion
 		$response = json_decode($json_obj, true);
 		return $response['FECompUltimoAutorizadoResult']['CbteNro'];
 	}
-
-	#-------------------------------------------------------------------------------
-	#FUNCION OBTENER NUMERO DE TIPO DE COMPROBANTE A PARTIR DE LETRAS
-	#ENTRADA: A, B, C, NCA, NCB, NCC, NDA, NDB, NDC, R, P, FP
-	#SALIDA:  01, 06, 11, 03, 08, 13, 02, 07, 12, 91, 100, 101
-	#===============================================================================
-	public static function tipo_comprobante($comprobante)
-	{
-		if ($comprobante == 'A') {
-			$tipo_comprobante = 1;
-		} else if ($comprobante == 'B') {
-			$tipo_comprobante = 6;
-		} else if ($comprobante == "C") {
-			$tipo_comprobante = 11;
-		} else if ($comprobante == "NCA") {
-			$tipo_comprobante = 3;
-		} else if ($comprobante == "NCB") {
-			$tipo_comprobante = 8;
-		} else if ($comprobante == "NCC") {
-			$tipo_comprobante = 13;
-		} else if ($comprobante == "NDA") {
-			$tipo_comprobante = 2;
-		} else if ($comprobante == "NDB") {
-			$tipo_comprobante = 7;
-		} else if ($comprobante == "NDC") {
-			$tipo_comprobante = 12;
-		} else if ($comprobante == 'R') {
-			$tipo_comprobante = 91;
-		} else if ($comprobante == 'P') {
-			$tipo_comprobante = 100;
-		} else if ($comprobante == 'FP') {
-			$tipo_comprobante = 101;
-		}
-		return $tipo_comprobante;
-	}
 	#-------------------------------------------------------------------------------
 	#ARMADO COMPROBANTE  ELECTRONICO
 	#SALIDA: RESULTADO, CAE, VENCIMIENTO_CAE, OBSERVACIONES, ERRORES
 	#===============================================================================
-	public function CAE_Factura_A()
+	public function obtener_cae()
 	{
 		$this->Autorizacion('wsfe');
 		#SETEAMOS FECHA SERVICIO SOLO SI EL CONCEPTO NO ES DE PRODUCTOS
@@ -357,10 +330,43 @@ class Facturacion
 		} else {
 			$this->obtener_errores_cae($response);
 		}
-		
-		dd($this);
 	}
-	private
+
+	#-------------------------------------------------------------------------------
+	#FUNCION OBTENER NUMERO DE TIPO DE COMPROBANTE A PARTIR DE LETRAS
+	#ENTRADA: A, B, C, NCA, NCB, NCC, NDA, NDB, NDC, R, P, FP
+	#SALIDA:  01, 06, 11, 03, 08, 13, 02, 07, 12, 91, 100, 101
+	#===============================================================================
+	public static function tipo_comprobante($comprobante)
+	{
+		if ($comprobante == 'A') {
+			$tipo_comprobante = 1;
+		} else if ($comprobante == 'B') {
+			$tipo_comprobante = 6;
+		} else if ($comprobante == "C") {
+			$tipo_comprobante = 11;
+		} else if ($comprobante == "NCA") {
+			$tipo_comprobante = 3;
+		} else if ($comprobante == "NCB") {
+			$tipo_comprobante = 8;
+		} else if ($comprobante == "NCC") {
+			$tipo_comprobante = 13;
+		} else if ($comprobante == "NDA") {
+			$tipo_comprobante = 2;
+		} else if ($comprobante == "NDB") {
+			$tipo_comprobante = 7;
+		} else if ($comprobante == "NDC") {
+			$tipo_comprobante = 12;
+		} else if ($comprobante == 'R') {
+			$tipo_comprobante = 91;
+		} else if ($comprobante == 'P') {
+			$tipo_comprobante = 100;
+		} else if ($comprobante == 'FP') {
+			$tipo_comprobante = 101;
+		}
+		return $tipo_comprobante;
+	}
+	
 	#-----------------------------------------------------------------------------------
 	#FUNCION OBTENER CONCEPTO
 	#ENTRADA: PRODUCTOS, SERVICIOS, PRODUCTOS Y SERVICIOS
@@ -674,6 +680,10 @@ class Facturacion
 				$error->comprobante_id = $this->comprobante->id;
 				$error->save();
 			}
+			foreach($this->detalles as $detalle){
+				$detalle->comprobante_id = $this->comprobante->id;
+				$detalle->save();
+			}
 		}
 	}
 
@@ -790,6 +800,9 @@ class Facturacion
 
 	private function validar_atributos()
 	{
+		if($this->comprobante === null){
+			trigger_error("Debe añadir un comprobante", E_USER_ERROR);
+		}
 		if ($this->comprobante->tipo === null) {
 			trigger_error('Tipo de comprobante no puede ser nulo', E_USER_ERROR);
 		}
