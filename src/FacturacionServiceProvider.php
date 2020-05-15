@@ -35,6 +35,6 @@ class FacturacionServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->make('Pampadev\Facturacion\Facturacion');
+        // $this->app->make('Pampadev\Facturacion\Facturacion');
     }
 }
