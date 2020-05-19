@@ -14,7 +14,7 @@ Route::get('/facturacion/prueba', function(){
             $imptotal = $impneto+$impiva;
 
             $comprobante = new Comprobante;
-            $comprobante->tipo =8;
+            $comprobante->tipo =1;
             $comprobante->fecha = date('Y-m-d');
             $comprobante->importe_total = $imptotal;
             $comprobante->importe_neto = $impneto;
@@ -51,7 +51,7 @@ Route::get('/facturacion/prueba', function(){
 
             $facturacion->addComprobante($comprobante);
             $facturacion->addAlicuotas(...$alicuotas);
-            $facturacion->addDetalles(...$detalles);
+            // $facturacion->addDetalles(...$detalles);
 
             $facturacion->generar_comprobante();
         }

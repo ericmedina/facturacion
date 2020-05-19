@@ -213,12 +213,18 @@ class Facturacion
 
 	public function generar_comprobante(){
 		$this->validar_atributos();
-		$this->comprobante->numero = $this->UltimoAutorizado()+1;
-		$this->obtener_cae();
+		if($this->comprobante->tipo == 91 || $this->comprobante->tipo == 100){
+			$this->comprobante->numero = $this->UltimoGuardado($this->comprobante->tipo) + 1;
+			$this->comprobante->resultado = "X";
+			$this->guardar_comprobante();
+		}else{
+			$this->comprobante->numero = $this->UltimoAutorizado()+1;
+			$this->obtener_cae();
+		}
 	}
+
 	#-------------------------------------------------------------------------------
 	#FUNCION ULTIMO COMPROBANTE AUTORIZADO
-	#Llena el atributo $ultimo_comprobante con el ultimo generado.
 	#===============================================================================
 	public function UltimoAutorizado()
 	{
@@ -244,6 +250,15 @@ class Facturacion
 		$response = json_decode($json_obj, true);
 		return $response['FECompUltimoAutorizadoResult']['CbteNro'];
 	}
+
+	#-------------------------------------------------------------------------------
+	#FUNCION OBTENER NUMERACION DE BD POR TIPO
+	#===============================================================================
+	public function UltimoGuardado($tipo){
+		$numero = Comprobante::where('tipo', $tipo)->pluck('numero')->last();
+		return $numero ?? 0;
+	}
+
 	#-------------------------------------------------------------------------------
 	#ARMADO COMPROBANTE  ELECTRONICO
 	#SALIDA: RESULTADO, CAE, VENCIMIENTO_CAE, OBSERVACIONES, ERRORES
@@ -823,10 +838,28 @@ class Facturacion
 		if (floatval($this->comprobante->importe_total) != (floatval($this->comprobante->importe_neto) + floatval($this->comprobante->importe_iva)) && floatval($this->comprobante->importe_neto) > 0) {
 			trigger_error('El importe total debe coincidir con la suma del importe neto y el importe iva', E_USER_ERROR);
 		}
+		if($this->comprobante->tipo != 91 && $this->comprobante->tipo != 100 && $this->alicuotas === null){
+			trigger_error('Para comprobantes enviados a AFIP debe añadir el array de alicuotas', E_USER_ERROR);
+		}
+		if($this->detalle === null){
+			trigger_error('Debe añadir el array de detalles del comprobante', E_USER_ERROR);
+		}
 	}
 
 	public static function facturacion_path($path)
 	{
 		return public_path() . '/facturacion/' . $path;
+	}
+
+	public function guardar_pdf(){
+		// $cae = $facturacion->cae;
+		// $vencimiento = $facturacion->vencimiento_cae;
+		// $codigo = $facturacion->cuit_emisor.$facturacion->tipo_comprobante.$facturacion->punto_venta.$facturacion->cae.$facturacion->vencimiento_cae;
+		// $bar = new DNS1D;
+		// $barcode = '<img src="data:image/png;base64,' . $bar->getBarcodePNG("$codigo", "I25+",1.2,45,array(1,1,1)) . '" alt="barcode"   />';
+		// $name = $request->tipo_comprobante.$request->num_comprobante.'.pdf';
+		// fopen(storage_path().'/app/public/facturacion/comprobantes/'.Auth::user()->cuit.'/'.$name,'w+');
+		// $pdf = PDF::loadView('layouts.pdf.comprobante', ['barcode'=>$barcode,'codigo'=>$codigo,'detalles'=>$detalles, 'Comprobante'=>$request, 'vencimiento'=>date("d-m-Y", strtotime($facturacion->vencimiento_cae)), 'cae'=>$facturacion->cae, 'num_comprobante' => $request->num_comprobante, 'tipo_comprobante' => $facturacion->tipo_comprobante, 'comp' => "B", 'titulo_factura'=>"Nota de crédito", 'punto_venta'=>$facturacion->punto_venta, 'fecha'=>$request->fecha]);
+		// $pdf->save(storage_path().'/app/public/facturacion/comprobantes/'.Auth::user()->cuit.'/'.$name);
 	}
 }
