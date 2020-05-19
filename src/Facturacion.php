@@ -13,6 +13,7 @@ use Pampadev\Facturacion\Models\Comprobante;
 use Pampadev\Facturacion\Models\ErrorComprobante;
 use Pampadev\Facturacion\Models\EventoComprobante;
 use Pampadev\Facturacion\Models\ObservacionComprobante;
+use \Milon\Barcode\DNS1D;
 use SoapClient;
 
 class Facturacion
@@ -71,7 +72,7 @@ class Facturacion
 	public $eventos;
 
 	//CLASE DETALLES_COMPROBANTE
-	public $detalle;
+	public $detalles;
 
 	#-----------------------------------------------------------------------------
 	#DATOS CLIENTE
@@ -213,6 +214,7 @@ class Facturacion
 
 	public function generar_comprobante(){
 		$this->validar_atributos();
+		// $bar = new DNS1D;
 		if($this->comprobante->tipo == 91 || $this->comprobante->tipo == 100){
 			$this->comprobante->numero = $this->UltimoGuardado($this->comprobante->tipo) + 1;
 			$this->comprobante->resultado = "X";
@@ -841,7 +843,7 @@ class Facturacion
 		if($this->comprobante->tipo != 91 && $this->comprobante->tipo != 100 && $this->alicuotas === null){
 			trigger_error('Para comprobantes enviados a AFIP debe añadir el array de alicuotas', E_USER_ERROR);
 		}
-		if($this->detalle === null){
+		if($this->detalles === null){
 			trigger_error('Debe añadir el array de detalles del comprobante', E_USER_ERROR);
 		}
 	}
