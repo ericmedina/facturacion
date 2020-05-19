@@ -13,7 +13,7 @@ use Pampadev\Facturacion\Models\Comprobante;
 use Pampadev\Facturacion\Models\ErrorComprobante;
 use Pampadev\Facturacion\Models\EventoComprobante;
 use Pampadev\Facturacion\Models\ObservacionComprobante;
-use \Milon\Barcode\DNS1D;
+// use \Milon\Barcode\DNS1D;
 use SoapClient;
 
 class Facturacion
