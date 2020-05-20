@@ -8,11 +8,14 @@ namespace Pampadev\Facturacion;
 
 
 use Pampadev\Facturacion\Models\AlicuotaComprobante;
+use Pampadev\Facturacion\Models\ClienteComprobante;
 use Pampadev\Facturacion\Models\DetalleComprobante;
 use Pampadev\Facturacion\Models\Comprobante;
 use Pampadev\Facturacion\Models\ErrorComprobante;
 use Pampadev\Facturacion\Models\EventoComprobante;
 use Pampadev\Facturacion\Models\ObservacionComprobante;
+use Milon\Barcode\DNS1D;
+use PDF;
 use SoapClient;
 
 class Facturacion
@@ -71,8 +74,10 @@ class Facturacion
 	public $eventos;
 
 	//CLASE DETALLES_COMPROBANTE
-	public $detalle;
+	public $detalles;
 
+	//OBJETO CLIENTE
+	public $cliente;
 	#-----------------------------------------------------------------------------
 	#DATOS CLIENTE
 	#=============================================================================
@@ -121,6 +126,9 @@ class Facturacion
 	}
 	public function addDetalles(DetalleComprobante ...$detalles){
 		$this->detalles = $detalles;
+	}
+	public function addCliente(ClienteComprobante $cliente){
+		$this->cliente = $cliente;
 	}
 	#------------------------------------------------------------------------------
 	#FUNCION UTILIZABLE DE WSAA CREA XML TA.XML
@@ -213,12 +221,21 @@ class Facturacion
 
 	public function generar_comprobante(){
 		$this->validar_atributos();
-		$this->comprobante->numero = $this->UltimoAutorizado()+1;
-		$this->obtener_cae();
+		if($this->comprobante->tipo == 91 || $this->comprobante->tipo == 100){
+			$this->comprobante->numero = $this->UltimoGuardado($this->comprobante->tipo) + 1;
+			$this->comprobante->resultado = "X";
+			$this->guardar_comprobante();
+		}else{
+			$this->comprobante->numero = $this->UltimoAutorizado()+1;
+			$this->obtener_cae();
+		}
+		if($this->comprobante->resultado == 'A' || $this->comprobante->resultado == 'X'){
+			$this->guardar_pdf();
+		}
 	}
+
 	#-------------------------------------------------------------------------------
 	#FUNCION ULTIMO COMPROBANTE AUTORIZADO
-	#Llena el atributo $ultimo_comprobante con el ultimo generado.
 	#===============================================================================
 	public function UltimoAutorizado()
 	{
@@ -244,6 +261,15 @@ class Facturacion
 		$response = json_decode($json_obj, true);
 		return $response['FECompUltimoAutorizadoResult']['CbteNro'];
 	}
+
+	#-------------------------------------------------------------------------------
+	#FUNCION OBTENER NUMERACION DE BD POR TIPO
+	#===============================================================================
+	public function UltimoGuardado($tipo){
+		$numero = Comprobante::where('tipo', $tipo)->pluck('numero')->last();
+		return $numero ?? 0;
+	}
+
 	#-------------------------------------------------------------------------------
 	#ARMADO COMPROBANTE  ELECTRONICO
 	#SALIDA: RESULTADO, CAE, VENCIMIENTO_CAE, OBSERVACIONES, ERRORES
@@ -332,40 +358,7 @@ class Facturacion
 		}
 	}
 
-	#-------------------------------------------------------------------------------
-	#FUNCION OBTENER NUMERO DE TIPO DE COMPROBANTE A PARTIR DE LETRAS
-	#ENTRADA: A, B, C, NCA, NCB, NCC, NDA, NDB, NDC, R, P, FP
-	#SALIDA:  01, 06, 11, 03, 08, 13, 02, 07, 12, 91, 100, 101
-	#===============================================================================
-	public static function tipo_comprobante($comprobante)
-	{
-		if ($comprobante == 'A') {
-			$tipo_comprobante = 1;
-		} else if ($comprobante == 'B') {
-			$tipo_comprobante = 6;
-		} else if ($comprobante == "C") {
-			$tipo_comprobante = 11;
-		} else if ($comprobante == "NCA") {
-			$tipo_comprobante = 3;
-		} else if ($comprobante == "NCB") {
-			$tipo_comprobante = 8;
-		} else if ($comprobante == "NCC") {
-			$tipo_comprobante = 13;
-		} else if ($comprobante == "NDA") {
-			$tipo_comprobante = 2;
-		} else if ($comprobante == "NDB") {
-			$tipo_comprobante = 7;
-		} else if ($comprobante == "NDC") {
-			$tipo_comprobante = 12;
-		} else if ($comprobante == 'R') {
-			$tipo_comprobante = 91;
-		} else if ($comprobante == 'P') {
-			$tipo_comprobante = 100;
-		} else if ($comprobante == 'FP') {
-			$tipo_comprobante = 101;
-		}
-		return $tipo_comprobante;
-	}
+	
 	
 	#-----------------------------------------------------------------------------------
 	#FUNCION OBTENER CONCEPTO
@@ -682,82 +675,25 @@ class Facturacion
 				$error->comprobante_id = $this->comprobante->id;
 				$error->save();
 			}
+			foreach($this->eventos as $evento){
+				$evento->comprobante_id = $this->comprobante->id;
+				$evento->save();
+			}
 			foreach($this->detalles as $detalle){
 				$detalle->comprobante_id = $this->comprobante->id;
 				$detalle->save();
 			}
+			$this->cliente->comprobante_id = $this->comprobante->id;
+			$this->cliente->save();
+			$this->comprobante->cliente;
+			$this->comprobante->detalles;
+			$this->comprobante->alicuotas;
+			$this->comprobante->observaciones;
+			$this->comprobante->errores;
+			$this->comprobante->eventos;
 		}
 	}
 
-	/*MANEJAR CODIGOS DE ERROR*/
-	public function traducir_error($codigo)
-	{
-		switch ($codigo) {
-			case '10000':
-				return 'El CUIT emisor no se encuentra autorizado a emitir el comprobante.';
-				break;
-			case '10001':
-				return 'La cantidad de registros enviados debe estar comprendida entre 1 y 9998.';
-				break;
-			case '10002':
-				return 'Las cantidades de registros enviados declaradas no coinciden.';
-				break;
-			case '10004':
-				return 'El punto de venta debe estar comprendido entre 1 y 99998.';
-				break;
-			case '10005':
-				return 'El punto de venta debe estar dado de alta y ser del tipo RECE.';
-				break;
-			case '10006':
-				return 'El tipo de comprobante no es válido. Debe ser un valor numérico mayor a 0.';
-				break;
-			case '10007':
-				return 'El tipo de comprobante debe ser:
-							- 01, 02, 03, 04, 05,34,39,60, 63 para los clase A
-							- 06, 07, 08, 09, 10, 35, 40,64, 61 para los clase B.
-							- 11, 12, 13, 15 para los clase C.
-							- 51, 52, 53, 54 para los clase M.
-							- 49 para los Bienes Usados.';
-				break;
-			case '10008':
-				return 'El número de comprobante debe estar comprendido entre 1 y 99999999.';
-				break;
-			case '10010':
-				return 'El número de comprobante debe estar comprendido entre 1 y 99999999.';
-				break;
-			case '10011':
-				return '"Comprobante desde:" debe ser mayor o igual a "Comprobante hasta:"';
-				break;
-			case '10013':
-				return 'Para comprobantes tipo "A" es obligatorio escribir el CUIT del cliente.';
-				break;
-			case '10014':
-				return 'El monto del comprobante debe ser menor a $5000.';
-				break;
-			case '10015':
-				return 'Si el monto del comprobante excede los $5000 se deberá especificar el DNI/CUIT del cliente.';
-				break;
-			case '10016':
-				return 'El N° de comprobante debe ser mayor al último autorizado.';
-				break;
-			case '10018':
-				return 'Error en el envío de los importes de IVA';
-				break;
-			case '10013':
-				return 'El CUIT emisor no se encuentra autorizado a emitir el comprobante';
-				break;
-			case '10013':
-				return 'El CUIT emisor no se encuentra autorizado a emitir el comprobante';
-				break;
-			case '10013':
-				return 'El CUIT emisor no se encuentra autorizado a emitir el comprobante';
-				break;
-
-			default:
-				return 'Error interno al generar comprobante, por favor comuníquese con un administrador.';
-				break;
-		}
-	}
 
 	/* CREAR URLS PARA EL MANEJO DE CLASES */
 	private function setear_urls()
@@ -823,10 +759,31 @@ class Facturacion
 		if (floatval($this->comprobante->importe_total) != (floatval($this->comprobante->importe_neto) + floatval($this->comprobante->importe_iva)) && floatval($this->comprobante->importe_neto) > 0) {
 			trigger_error('El importe total debe coincidir con la suma del importe neto y el importe iva', E_USER_ERROR);
 		}
+		if($this->comprobante->tipo != 91 && $this->comprobante->tipo != 100 && $this->alicuotas === null){
+			trigger_error('Para comprobantes enviados a AFIP debe añadir el array de alicuotas', E_USER_ERROR);
+		}
+		if($this->detalles === null){
+			trigger_error('Debe añadir el array de detalles del comprobante', E_USER_ERROR);
+		}
 	}
 
 	public static function facturacion_path($path)
 	{
 		return public_path() . '/facturacion/' . $path;
+	}
+
+	public function guardar_pdf(){
+		$codigo = $this->cuit_emisor.$this->comprobante->tipo.$this->punto_venta.$this->comprobante->cae.strval(date('Ymd', strtotime($this->comprobante->vencimiento_cae)));
+		$bar = new DNS1D;
+		$barcode = '<img src="data:image/png;base64,' . $bar->getBarcodePNG("$codigo", "I25+",1.2,45,array(1,1,1)) . '" alt="barcode"   />';
+		$name = $this->comprobante->tipo."_".str_pad($this->comprobante->numero,8,'0',STR_PAD_LEFT).'.pdf';
+		fopen($this->facturacion_path($name),'w+');
+		$pdf = PDF::loadView('pdf.comprobante', [
+			'barcode'=>$barcode,
+			'codigo' => $codigo, 
+			'comprobante'=>$this->comprobante,
+			'detalles'=>$this->detalles, 
+			'cliente' => $this->cliente]);
+		$pdf->save($this->facturacion_path($name));
 	}
 }
