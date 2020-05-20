@@ -24,8 +24,13 @@ class FacturacionServiceProvider extends ServiceProvider
         ], 'migrations');
         
         $this->publishes([
-            __DIR__.'/facturacion'              =>  public_path('facturacion')
+            __DIR__.'/facturacion'              =>  public_path('facturacion'),
+            __DIR__.'/css'                      =>  public_path('css')
         ],'assets');
+        
+        $this->publishes([
+            __DIR__.'/pdf'                      =>  base_path('resources/views/pdf')
+        ], 'pdf');
     }
 
     /**
