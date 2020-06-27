@@ -229,9 +229,9 @@ class Facturacion
 			$this->comprobante->numero = $this->UltimoAutorizado()+1;
 			$this->obtener_cae();
 		}
-		if($this->comprobante->resultado == 'A' || $this->comprobante->resultado == 'X'){
-			$this->guardar_pdf();
-		}
+		// if($this->comprobante->resultado == 'A' || $this->comprobante->resultado == 'X'){
+		// 	$this->guardar_pdf();
+		// }
 	}
 
 	#-------------------------------------------------------------------------------
@@ -683,9 +683,9 @@ class Facturacion
 				$detalle->comprobante_id = $this->comprobante->id;
 				$detalle->save();
 			}
-			$this->cliente->comprobante_id = $this->comprobante->id;
-			$this->cliente->save();
-			$this->comprobante->cliente;
+			// $this->cliente->comprobante_id = $this->comprobante->id;
+			// $this->cliente->save();
+			// $this->comprobante->cliente;
 			$this->comprobante->detalles;
 			$this->comprobante->alicuotas;
 			$this->comprobante->observaciones;
