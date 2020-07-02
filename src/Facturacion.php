@@ -756,7 +756,7 @@ class Facturacion
 		if ($this->comprobante->importe_iva === null) {
 			trigger_error('El importe de iva del comprobante no puede ser nulo', E_USER_ERROR);
 		}
-		if (floatval($this->comprobante->importe_total) != (floatval($this->comprobante->importe_neto) + floatval($this->comprobante->importe_iva)) && floatval($this->comprobante->importe_neto) > 0) {
+		if ($this->comprobante->importe_total != ($this->comprobante->importe_neto + $this->comprobante->importe_iva) && floatval($this->comprobante->importe_neto) > 0) {
 			trigger_error('El importe total debe coincidir con la suma del importe neto y el importe iva', E_USER_ERROR);
 		}
 		if($this->comprobante->tipo != 91 && $this->comprobante->tipo != 100 && $this->alicuotas === null){
