@@ -758,7 +758,7 @@ class Facturacion
 		}
 		if(floatval($this->comprobante->importe_neto) > 0){
 			$imp = $this->comprobante->importe_neto + $this->comprobante->importe_iva;
-			if ($this->comprobante->importe_total != $imp) {
+			if (round($this->comprobante->importe_total,2) != round($imp,2)) {
 				trigger_error('El importe total ($'.$this->comprobante->importe_total.') debe coincidir con la suma del importe neto y el importe iva ($'.$imp.').', E_USER_ERROR);
 			}
 		}
