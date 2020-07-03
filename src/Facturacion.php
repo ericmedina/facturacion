@@ -756,8 +756,10 @@ class Facturacion
 		if ($this->comprobante->importe_iva === null) {
 			trigger_error('El importe de iva del comprobante no puede ser nulo', E_USER_ERROR);
 		}
-		if ($this->comprobante->importe_total != ($this->comprobante->importe_neto + $this->comprobante->importe_iva) && floatval($this->comprobante->importe_neto) > 0) {
-			trigger_error('El importe total ($'.$this->comprobante->importe_total.') debe coincidir con la suma del importe neto y el importe iva ($'.($this->comprobante->importe_neto + $this->comprobante->importe_iva).')', E_USER_ERROR);
+		if(floatval($this->comprobante->importe_neto) > 0){
+			if ($this->comprobante->importe_total != ($this->comprobante->importe_neto + $this->comprobante->importe_iva)) {
+				trigger_error('El importe total ($'.$this->comprobante->importe_total.') debe coincidir con la suma del importe neto y el importe iva ($'.($this->comprobante->importe_neto + $this->comprobante->importe_iva).')', E_USER_ERROR);
+			}
 		}
 		if($this->comprobante->tipo != 91 && $this->comprobante->tipo != 100 && $this->alicuotas === null){
 			trigger_error('Para comprobantes enviados a AFIP debe añadir el array de alicuotas', E_USER_ERROR);
