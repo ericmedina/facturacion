@@ -3,6 +3,7 @@
 use Pampadev\Facturacion\Facturacion;
 use Pampadev\Facturacion\Models\AlicuotaComprobante;
 use Pampadev\Facturacion\Models\DetalleComprobante;
+use Pampadev\Facturacion\Models\ClienteComprobante;
 use Pampadev\Facturacion\Models\Comprobante;
 
 Route::get('/facturacion/prueba', function(){
@@ -14,13 +15,13 @@ Route::get('/facturacion/prueba', function(){
             $imptotal = $impneto+$impiva;
 
             $comprobante = new Comprobante;
-            $comprobante->tipo =1;
+            $comprobante->tipo =6;
             $comprobante->fecha = date('Y-m-d');
             $comprobante->importe_total = $imptotal;
             $comprobante->importe_neto = $impneto;
             $comprobante->importe_iva = $impiva;
-            $comprobante->cliente_tipo_doc = 99;
-            $comprobante->cliente_num_doc = 0;
+            $comprobante->cliente_tipo_doc = 80;
+            $comprobante->cliente_num_doc = 20177307352;
     
             $alicuotas = [];
             $alicuota = new AlicuotaComprobante;
@@ -47,19 +48,24 @@ Route::get('/facturacion/prueba', function(){
             
             $detalles[] = $detalle;
 
+            $cliente = new ClienteComprobante;
+            $cliente->nombre = "ABEL OSVALDO MEDINA";
+            $cliente->num_doc = $comprobante->cliente_num_doc;
+            $cliente->condicion_iva = "RESPONSABLE INSCRIPTO";
+            $cliente->condicion_venta = "CONTADO";
+
             $facturacion = new Facturacion;
 
             $facturacion->addComprobante($comprobante);
             $facturacion->addAlicuotas(...$alicuotas);
-            // $facturacion->addDetalles(...$detalles);
+            $facturacion->addDetalles(...$detalles);
+            $facturacion->addCliente($cliente);
 
             $facturacion->generar_comprobante();
         }
         $tiempo_fin = microtime(true);
         $tiempo = $tiempo_fin - $tiempo_inicio;
-        dd($tiempo);
-
-       return response()->json(['success'=> true]);
+       return response()->json(['success'=> true, 'comprobante' => $facturacion->comprobante]);
     }catch(Exception $e){
         $respuesta = array('success' => false, 'mensaje' => $e->getMessage(),'archivo' => $e->getFile(), 'linea' => $e->getLine());
         return response()->json(compact('respuesta'));
