@@ -17,6 +17,7 @@ class CreateComprobantesTable extends Migration
             $table->id();
             $table->integer('tipo');
             $table->integer('numero');
+            $table->string('cliente')->nullable();
             $table->integer('cliente_tipo_doc')->nullable();
             $table->unsignedBigInteger('cliente_num_doc')->nullable();
             $table->date('fecha');
