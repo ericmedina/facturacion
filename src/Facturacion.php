@@ -542,7 +542,7 @@ class Facturacion
 			)
 		));
 
-		$client = new \SoapClient("https://awshomo.afip.gov.ar/sr-padron/webservices/personaServiceA5?WSDL", array(
+		$client = new \SoapClient("https://aws.afip.gov.ar/sr-padron/webservices/personaServiceA5?WSDL", array(
 			'soap_version'   	=> SOAP_1_1,
 			'trace'          	=> 0,
 			'exceptions' 		=> 0,
@@ -555,7 +555,7 @@ class Facturacion
 
 		$FEParamGetTiposIva = array('getPersona' => $getPersona);
 		#ENVIAMOS EL REQUEST
-		$results = $client->getPersona($getPersona);
+		$results = $client->getPersona_v2($getPersona);
 
 		#GUARDAMOS RESPONSE
 
@@ -565,6 +565,7 @@ class Facturacion
 		if (is_soap_fault($results)) {
 			exit("SOAP Fault: " . $results->faultcode . "\n" . $results->faultstring . "\n");
 		}
+		return $json_obj;
 	}
 
 	public function Consultar()
@@ -649,13 +650,13 @@ class Facturacion
 					$evento_comprobante = new EventoComprobante;
 					$evento_comprobante->codigo = $evt->Code;
 					$evento_comprobante->descripcion = $evt->Msg;
-					$this->Eventos[] = $error_comprobante;
+					$this->Eventos[] = $evento_comprobante;
 				}
 			}else{
 				$evento_comprobante = new EventoComprobante;
 				$evento_comprobante->codigo = $eventos->Code;
 				$evento_comprobante->descripcion = $eventos->Msg;
-				$this->Eventos[] = $error_comprobante;
+				$this->Eventos[] = $evento_comprobante;
 			}
 		}
 	}
