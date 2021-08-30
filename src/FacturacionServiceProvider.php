@@ -24,7 +24,7 @@ class FacturacionServiceProvider extends ServiceProvider
         ], 'migrations');
         
         $this->publishes([
-            __DIR__.'/facturacion'              =>  public_path('facturacion'),
+            __DIR__.'/static/facturacion'              =>  public_path('facturacion'),
             __DIR__.'/css'                      =>  public_path('css')
         ],'assets');
         
