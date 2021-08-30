@@ -3,7 +3,7 @@ namespace Pampadev\Facturacion\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Comprobante extends model{
+class Comprobante extends Model{
 
 	public function cliente(){
         return $this->hasOne('Pampadev\Facturacion\Models\ClienteComprobante');

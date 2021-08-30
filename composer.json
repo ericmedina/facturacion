@@ -21,7 +21,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Pampadev\\Facturacion\\": "src/"
+            "Pampadev\\Facturacion\\": "src/",
+            "Pampadev\\Facturacion\\Models": "src/Models"
         }
     },
     "extra": {
