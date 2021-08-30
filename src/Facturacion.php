@@ -318,7 +318,7 @@ class Facturacion
 
 		if($this->comprobante->tipo == 3 || $this->comprobante->tipo == 8 || $this->comprobante->tipo == 11){
 			$array_assoc = array('Tipo' => $this->tipo_assoc, 'PtoVta' => $this->punto_venta, 'Nro' => $this->assoc);
-			$FECAEDetRequest['CbteAsoc'] = $array_assoc;
+			$FECAEDetRequest['CbtesAsoc'] = array('CbteAsoc' => $array_assoc);
 		}
 
 
