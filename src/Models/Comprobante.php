@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace Pampadev\Facturacion\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -6,23 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 class Comprobante extends Model{
 
 	public function cliente(){
-        return $this->hasOne('Pampadev\Facturacion\Models\ClienteComprobante');
+        return $this->hasOne(ClienteComprobante::class);
     }
-    
+
     public function alicuotas(){
-        return $this->hasMany('Pampadev\Facturacion\Models\AlicuotaComprobante');
+        return $this->hasMany(AlicuotaComprobante::class);
     }
 
     public function eventos(){
-        return $this->hasMany('Pampadev\Facturacion\Models\EventoComprobante');
+        return $this->hasMany(EventoComprobante::class);
     }
 
     public function observaciones(){
-        return $this->hasMany('Pampadev\Facturacion\Models\ObservacionComprobante');
+        return $this->hasMany(ObservacionComprobante::class);
     }
 
     public function errores(){
-        return $this->hasMany('Pampadev\Facturacion\Models\ErrorComprobante');
+        return $this->hasMany(ErrorComprobante::class);
     }
 
     #-------------------------------------------------------------------------------

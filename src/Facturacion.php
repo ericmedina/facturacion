@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 
+ *
  */
 
 namespace Pampadev\Facturacion;
@@ -14,9 +14,8 @@ use Pampadev\Facturacion\Models\Comprobante;
 use Pampadev\Facturacion\Models\ErrorComprobante;
 use Pampadev\Facturacion\Models\EventoComprobante;
 use Pampadev\Facturacion\Models\ObservacionComprobante;
-use Milon\Barcode\DNS1D;
-use PDF;
 use SoapClient;
+use SoapFault;
 
 class Facturacion
 {
@@ -199,7 +198,7 @@ class Facturacion
 				}
 			}
 			fclose($inf);
-			$client = new \SoapClient($this->WSDL_WSAA, array(
+			$client = new SoapClient($this->WSDL_WSAA, array(
 				'soap_version'   => SOAP_1_2,
 				'location'       => $this->URL_WSAA,
 				'trace'          => 1
@@ -219,6 +218,9 @@ class Facturacion
 		$this->sign = $sign;
 	}
 
+    /**
+     * @return void
+     */
 	public function generar_comprobante(){
 		$this->validar_atributos();
 		if($this->comprobante->tipo == 91 || $this->comprobante->tipo == 100){
@@ -229,22 +231,22 @@ class Facturacion
 			$this->comprobante->numero = $this->UltimoAutorizado()+1;
 			$this->obtener_cae();
 		}
-		// if($this->comprobante->resultado == 'A' || $this->comprobante->resultado == 'X'){
-		// 	$this->guardar_pdf();
-		// }
 	}
 
 	#-------------------------------------------------------------------------------
 	#FUNCION ULTIMO COMPROBANTE AUTORIZADO
 	#===============================================================================
-	public function UltimoAutorizado()
+    /**
+     * @throws SoapFault
+     */
+    public function UltimoAutorizado()
 	{
 		$this->Autorizacion('wsfe');
 		$cuitemisor = (float) $this->cuit_emisor;
 		$auth = array('Token' => $this->token, 'Sign' => $this->sign, 'Cuit' => $cuitemisor);
 		$FECompUltimoAutorizado = array('Auth' => $auth, 'PtoVta' => intval($this->punto_venta), 'CbteTipo' => $this->comprobante->tipo);
 		//INICIAR CLIENTE SOAP
-		$client = new \SoapClient($this->WSDL_ULT, array(
+		$client = new SoapClient($this->WSDL_ULT, array(
 			'soap_version'   => SOAP_1_2,
 			'location'       => $this->URL_ULT,
 			'trace'          => 1
@@ -290,7 +292,7 @@ class Facturacion
 
 		#LLAMAMOS CLIENTE SOAP
 
-		$client = new \SoapClient($this->WSDL_CAE, array(
+		$client = new SoapClient($this->WSDL_CAE, array(
 			'soap_version'   => SOAP_1_2,
 			'location'       => $this->URL_CAE,
 			'trace'          => 1
@@ -309,7 +311,7 @@ class Facturacion
 		foreach ($this->alicuotas as $alicuota) {
 			$AlicIva[] = array('Id' => $alicuota->codigo, 'BaseImp' => $alicuota->importe_base, 'Importe' => $alicuota->importe_iva);
 		}
-		
+
 		// $array_assoc = array('Tipo' => 11, 'PtoVta' => $this->punto_venta, 'Nro' => $this->assoc);
 		// $cbtes_assoc = array('CbteAsoc' => $array_assoc);
 
@@ -363,8 +365,8 @@ class Facturacion
 		}
 	}
 
-	
-	
+
+
 	#-----------------------------------------------------------------------------------
 	#FUNCION OBTENER CONCEPTO
 	#ENTRADA: PRODUCTOS, SERVICIOS, PRODUCTOS Y SERVICIOS
@@ -413,7 +415,7 @@ class Facturacion
 
 		#LLAMAMOS CLIENTE SOAP
 
-		$client = new \SoapClient($this->WSDL_CAE, array(
+		$client = new SoapClient($this->WSDL_CAE, array(
 			'soap_version'   => SOAP_1_2,
 			'location'       => $this->URL_TIPO_IVA,
 			'trace'          => 1
@@ -511,7 +513,7 @@ class Facturacion
 			}
 		}
 		fclose($inf);
-		$client = new \SoapClient($this->WSDL_WSAA, array(
+		$client = new SoapClient($this->WSDL_WSAA, array(
 			'soap_version'   => SOAP_1_2,
 			'location'       => $this->URL_WSAA,
 			'trace'          => 1
@@ -547,7 +549,7 @@ class Facturacion
 			)
 		));
 
-		$client = new \SoapClient("https://aws.afip.gov.ar/sr-padron/webservices/personaServiceA5?WSDL", array(
+		$client = new SoapClient("https://aws.afip.gov.ar/sr-padron/webservices/personaServiceA5?WSDL", array(
 			'soap_version'   	=> SOAP_1_1,
 			'trace'          	=> 0,
 			'exceptions' 		=> 0,
@@ -584,7 +586,7 @@ class Facturacion
 		$FECompConsultar = array('Auth' => $auth, 'FeCompConsReq' => $FeCompConsReq);
 
 		//INICIAR CLIENTE SOAP
-		$client = new \SoapClient($this->WSDL_COMP, array(
+		$client = new SoapClient($this->WSDL_COMP, array(
 			'soap_version'   => SOAP_1_2,
 			'location'       => $this->URL_COMP,
 			'trace'          => 1
@@ -626,7 +628,6 @@ class Facturacion
 		}
 	}
 	public function obtener_errores_cae($response){
-		$errores = [];
 		if(isset($response->FECAESolicitarResult->Errors)){
 				//SI ES ARRAY
 			$errores = $response->FECAESolicitarResult->Errors->Err;
@@ -644,10 +645,9 @@ class Facturacion
 				$this->Errores[] = $error_comprobante;
 			}
 		}
-	
+
 	}
 	public function obtener_eventos_cae($response){
-		$eventos = [];
 		if(isset($response->FECAESolicitarResult->Events)){
 			$eventos = $response->FECAESolicitarResult->Events->Evt;
 			if(is_array($eventos)){
@@ -689,14 +689,6 @@ class Facturacion
 				$detalle->comprobante_id = $this->comprobante->id;
 				$detalle->save();
 			}
-			// $this->cliente->comprobante_id = $this->comprobante->id;
-			// $this->cliente->save();
-			// $this->comprobante->cliente;
-			$this->comprobante->detalles;
-			$this->comprobante->alicuotas;
-			$this->comprobante->observaciones;
-			$this->comprobante->errores;
-			$this->comprobante->eventos;
 		}
 	}
 
@@ -781,18 +773,5 @@ class Facturacion
 		return public_path() . '/facturacion/' . $path;
 	}
 
-	public function guardar_pdf(){
-		$codigo = $this->cuit_emisor.$this->comprobante->tipo.$this->punto_venta.$this->comprobante->cae.strval(date('Ymd', strtotime($this->comprobante->vencimiento_cae)));
-		$bar = new DNS1D;
-		$barcode = '<img src="data:image/png;base64,' . $bar->getBarcodePNG("$codigo", "I25+",1.2,45,array(1,1,1)) . '" alt="barcode"   />';
-		$name = $this->comprobante->tipo."_".str_pad($this->comprobante->numero,8,'0',STR_PAD_LEFT).'.pdf';
-		fopen($this->facturacion_path($name),'w+');
-		$pdf = PDF::loadView('pdf.comprobante', [
-			'barcode'=>$barcode,
-			'codigo' => $codigo, 
-			'comprobante'=>$this->comprobante,
-			'detalles'=>$this->detalles, 
-			'cliente' => $this->cliente]);
-		$pdf->save($this->facturacion_path($name));
-	}
+
 }

@@ -1,6 +1,6 @@
 {
     "name": "pampadev/facturacion",
-    "description": "modulo de facturacion",
+    "description": "Módulo de facturacion",
     "type": "project",
     "license": "MIT",
     "authors": [
@@ -14,10 +14,7 @@
     "require": {
         "php": ">=7",
         "nesbot/carbon": "^2.34",
-        "milon/barcode": "^7.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit" : "~5.0"
+        "ext-soap": "*"
     },
     "autoload": {
         "psr-4": {
