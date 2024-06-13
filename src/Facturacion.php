@@ -93,6 +93,8 @@ class Facturacion
 	public $importe_tributo = "0";
 	public $moneda_id = "PES";
 	public $moneda_cotiz = "1";
+	public $assoc;
+	public $tipo_assoc;
 
 	#------------------------------------------------------------------------------
 	#ATRIBUTOS ALMACENAMIENTO RESPUESTA
@@ -319,6 +321,10 @@ class Facturacion
 		$FECAEDetRequest = array('Concepto' => $this->concepto, 'DocTipo' => $this->comprobante->cliente_tipo_doc, 'DocNro' => $this->comprobante->cliente_num_doc, 'CbteDesde' => $this->comprobante->numero, 'CbteHasta' => $this->comprobante->numero, 'CbteFch' => date('Ymd',strtotime($this->comprobante->fecha)), 'ImpTotal' => $this->comprobante->importe_total, 'ImpTotConc' => $this->importe_total_concepto, 'ImpNeto' => $this->comprobante->importe_neto, 'ImpOpEx' => $this->importe_operaciones_externas, 'ImpTrib' => $this->importe_tributo, 'ImpIVA' => $this->comprobante->importe_iva, 'FchServDesde' => $this->fecha_servicio_desde, 'FchServHasta' => $this->fecha_servicio_hasta, 'FchVtoPago' => $this->fecha_vencimiento_pago, 'MonId' => $this->moneda_id, 'MonCotiz' => $this->moneda_cotiz, 'Iva' => $AlicIva);
 
 
+		if($this->comprobante->tipo == 3 || $this->comprobante->tipo == 8 || $this->comprobante->tipo == 11){
+			$array_assoc = array('Tipo' => $this->tipo_assoc, 'PtoVta' => $this->punto_venta, 'Nro' => $this->assoc);
+			$FECAEDetRequest['CbtesAsoc'] = array('CbteAsoc' => $array_assoc);
+		}
 
 		#DAMOS FORMATO AL MENSAJE
 		$FeDetReq = array('FECAEDetRequest' => $FECAEDetRequest);
